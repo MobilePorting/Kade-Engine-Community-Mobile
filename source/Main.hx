@@ -157,6 +157,8 @@ class Main extends Sprite
 		Debug.onGameStart();
 		Application.current.window.onFocusOut.add(onWindowFocusOut);
 		Application.current.window.onFocusIn.add(onWindowFocusIn);
+
+		MobileData.init();
 	}
 
 	public function checkInternetConnection()

@@ -1,12 +1,12 @@
 package kec.backend.modding;
 
 #if FEATURE_MODCORE
+import polymod.Polymod;
 import polymod.backends.OpenFLBackend;
 import polymod.backends.PolymodAssets.PolymodAssetType;
 import polymod.format.ParseRules.LinesParseFormat;
 import polymod.format.ParseRules.TextFileFormat;
 import polymod.format.ParseRules;
-import polymod.Polymod;
 #end
 #if FEATURE_FILESYSTEM
 import sys.FileSystem;
@@ -127,6 +127,7 @@ class ModCore
 				"sm" => "./sm",
 				"songs" => "./songs",
 				"shared" => "./shared",
+				"mobile" => "./mobile",
 				"videos" => "./videos",
 				"scripts" => "./scripts",
 				"weeks" => "./",

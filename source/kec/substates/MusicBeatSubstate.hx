@@ -6,11 +6,12 @@ import flixel.util.FlxDestroyUtil;
 import kec.backend.Controls;
 import kec.backend.PlayerSettings;
 import kec.backend.chart.TimingStruct;
-import mobile.flixel.FlxVirtualPad;
+import mobile.kec.objects.TouchPad;
 
 class MusicBeatSubstate extends FlxSubState
 {
 	public static var instance:MusicBeatSubstate;
+
 	public function new()
 	{
 		instance = this;
@@ -22,24 +23,7 @@ class MusicBeatSubstate extends FlxSubState
 		/*Application.current.window.onFocusIn.remove(onWindowFocusOut);
 			Application.current.window.onFocusIn.remove(onWindowFocusIn); */
 
-		// Mobile Controls Related
-		if (trackedInputsMobileControls.length > 0)
-			controls.removeVirtualControlsInput(trackedInputsMobileControls);
-
-		if (trackedInputsVirtualPad.length > 0)
-			controls.removeVirtualControlsInput(trackedInputsVirtualPad);
-
-		if (virtualPad != null)
-			virtualPad = FlxDestroyUtil.destroy(virtualPad);
-
-		if (mobileControls != null)
-			mobileControls = FlxDestroyUtil.destroy(mobileControls);
-
-		if (camControls != null)
-			camControls = FlxDestroyUtil.destroy(camControls);
-
-		if (camVPad != null)
-			camVPad = FlxDestroyUtil.destroy(camVPad);
+		removeTouchPad();
 
 		super.destroy();
 	}
@@ -59,82 +43,55 @@ class MusicBeatSubstate extends FlxSubState
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
 
+	public var touchPad:TouchPad;
 	public var mobileControls:MobileControls;
-	public var virtualPad:FlxVirtualPad;
-	public var camControls:FlxCamera;
-	public var camVPad:FlxCamera;
 
-	var trackedInputsMobileControls:Array<FlxActionInput> = [];
-	var trackedInputsVirtualPad:Array<FlxActionInput> = [];
+	public var touchPadCamera:FlxCamera;
+	public var mobileControlsCamera:FlxCamera;
 
-	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode):Void
+	public function addTouchPad(dpadMode:String, actionMode:String):TouchPad
 	{
-		if (virtualPad != null)
-			removeVirtualPad();
+		if (touchPad != null)
+			removeTouchPad();
 
-		virtualPad = new FlxVirtualPad(DPad, Action);
-		add(virtualPad);
+		touchPad = new TouchPad(dpadMode, actionMode);
+		add(touchPad);
 
-		controls.setVirtualPadUI(virtualPad, DPad, Action);
-		trackedInputsVirtualPad = controls.trackedInputsUI;
-		controls.trackedInputsUI = [];
+		return touchPad;
 	}
 
-	public function removeVirtualPad():Void
+	public function removeTouchPad():Void
 	{
-		if (trackedInputsVirtualPad.length > 0)
-			controls.removeVirtualControlsInput(trackedInputsVirtualPad);
+		removeTouchPadCamera();
 
-		if (virtualPad != null)
-			remove(virtualPad);
-	}
-
-	public function addMobileControls(DefaultDrawTarget:Bool = false):Void
-	{
-		if (mobileControls != null)
-			removeMobileControls();
-
-		mobileControls = new MobileControls();
-
-		switch (MobileControls.mode)
+		if (touchPad != null)
 		{
-			case 'Pad-Right' | 'Pad-Left' | 'Pad-Custom':
-				controls.setVirtualPadNOTES(mobileControls.virtualPad, RIGHT_FULL, NONE);
-			case 'Hitbox':
-				controls.setHitbox(mobileControls.hitbox);
-			default: // do nothing
+			remove(touchPad);
+			touchPad = FlxDestroyUtil.destroy(touchPad);
 		}
-
-		trackedInputsMobileControls = controls.trackedInputsNOTES;
-		controls.trackedInputsNOTES = [];
-
-		camControls = new FlxCamera();
-		camControls.bgColor.alpha = 0;
-		FlxG.cameras.add(camControls, DefaultDrawTarget);
-
-		mobileControls.cameras = [camControls];
-		mobileControls.visible = false;
-		add(mobileControls);
 	}
 
-	public function removeMobileControls()
+	public function addTouchPadCamera():Void
 	{
-		if (trackedInputsMobileControls.length > 0)
-			controls.removeVirtualControlsInput(trackedInputsMobileControls);
-
-		if (mobileControls != null)
-			remove(mobileControls);
-	}
-
-	public function addVirtualPadCamera(DefaultDrawTarget:Bool = false):Void
-	{
-		if (virtualPad == null)
+		if (touchPad == null)
 			return;
 
-		camVPad = new FlxCamera();
-		camVPad.bgColor.alpha = 0;
-		FlxG.cameras.add(camVPad, DefaultDrawTarget);
-		virtualPad.cameras = [camVPad];
+		touchPadCamera = new FlxCamera();
+		FlxG.cameras.add(touchPadCamera, false);
+		touchPadCamera.bgColor.alpha = 0;
+		touchPad.cameras = [touchPadCamera];
+	}
+
+	public function removeTouchPadCamera():Void
+	{
+		if (touchPadCamera == null)
+			return;
+
+		if (touchPad != null)
+			touchPad.cameras = [FlxG.camera];
+
+		FlxG.cameras.remove(touchPadCamera);
+		touchPadCamera = FlxDestroyUtil.destroy(touchPadCamera);
 	}
 
 	var oldStep:Int = 0;

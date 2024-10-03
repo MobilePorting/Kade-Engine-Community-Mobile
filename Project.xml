@@ -86,6 +86,7 @@
 	<assets path="assets/weeks"   library="weeks"   rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/weeks"   library="weeks"   rename="assets" exclude="*.mp3" unless="web"/>
 	<assets path="assets/sm"   library="sm"  if="FEATURE_STEPMANIA"/>
+	<assets path="assets/mobile"   library="mobile"/>
 	
 	<assets path='mods' embed='false' if="FEATURE_MODCORE"/>
 	
@@ -95,6 +96,7 @@
 	<library name="videos"        preload="true" if="VIDEOS"/>
 	<library name="songs"         preload="true" />
 	<library name="weeks"   preload="true" />
+	<library name="mobile"  preload="true" />
 
 	<assets path="assets/fonts"/>
 	<assets path='alsoft.ini' if="windows"/>

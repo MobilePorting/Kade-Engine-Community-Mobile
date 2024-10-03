@@ -22,8 +22,8 @@ class OutdatedSubState extends MusicBeatState
 		bg.antialiasing = FlxG.save.data.antialiasing;
 		add(bg);
 
-		final buttonACCEPT:String = MobileControls.enabled ? "A" : "Space";
-		final buttonBACK:String = MobileControls.enabled ? "B" : Constants.kecVer.contains("PRE-RELEASE") ? "Space/Escape" : "ENTER";
+		final buttonACCEPT:String = controls.mobileC ? "A" : "Space";
+		final buttonBACK:String = controls.mobileC ? "B" : Constants.kecVer.contains("PRE-RELEASE") ? "Space/Escape" : "ENTER";
 
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
 			"Your KEC Port is outdated!\nYou are on "
@@ -87,12 +87,12 @@ class OutdatedSubState extends MusicBeatState
 
 		Paths.clearUnusedMemory();
 
-		addVirtualPad(NONE, A_B);
+		addTouchPad('NONE', 'A_B');
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (virtualPad.buttonA.justPressed || FlxG.keys.justPressed.SPACE && !Constants.kecVer.contains("PRE-RELEASE"))
+		if (touchPad.buttonA.justPressed || FlxG.keys.justPressed.SPACE && !Constants.kecVer.contains("PRE-RELEASE"))
 		{
 			fancyOpenURL("https://therealjake12.github.io/Kade-Engine-Community/changelogs/changelog-" + needVer);
 		}

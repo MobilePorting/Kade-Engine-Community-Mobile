@@ -2,15 +2,19 @@ package mobile.kec.backend;
 
 import flixel.util.FlxSave;
 
+/**
+ * ...
+ * @author: Lily Ross (mcagabe19)
+ */
 class KEMobileData
 {
 	public static function initSave()
 	{
 		if (FlxG.save.data.mobileCMode == null)
-			FlxG.save.data.mobileCMode = 'Hitbox';
+			FlxG.save.data.mobileCMode = 3;
 
 		if (FlxG.save.data.mobileCAlpha == null)
-			FlxG.save.data.mobileCAlpha = #if mobile 0.6 #else 0 #end;
+			FlxG.save.data.mobileCAlpha = FlxG.onMobile ? 0.6 : 0;
 
 		if (FlxG.save.data.hitboxType == null)
 			FlxG.save.data.hitboxType = 0;

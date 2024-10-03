@@ -3,13 +3,14 @@ package kec.backend;
 import flixel.input.FlxInput;
 import flixel.input.actions.FlxAction;
 import flixel.input.actions.FlxActionInput;
-import flixel.input.actions.FlxActionInputDigital;
 import flixel.input.actions.FlxActionManager;
 import flixel.input.actions.FlxActionSet;
 import flixel.input.keyboard.FlxKey;
-import mobile.flixel.FlxButton;
-import mobile.flixel.FlxVirtualPad;
-import mobile.kec.objects.Hitbox;
+import kec.states.MusicBeatState;
+import kec.substates.MusicBeatSubstate;
+import mobile.kec.objects.TouchButton;
+import mobile.kec.objects.TouchPad;
+import mobile.kec.input.MobileButtonsList;
 
 #if (haxe >= "4.0.0")
 enum abstract Action(String) to String from String
@@ -92,6 +93,8 @@ enum KeyboardScheme
  */
 class Controls extends FlxActionSet
 {
+	public static var instance:Controls;
+
 	var _up = new FlxActionDigital(Action.UP);
 	var _left = new FlxActionDigital(Action.LEFT);
 	var _right = new FlxActionDigital(Action.RIGHT);
@@ -121,72 +124,72 @@ class Controls extends FlxActionSet
 	public var UP(get, never):Bool;
 
 	inline function get_UP()
-		return _up.check();
+		return _up.check() || mobileControlsPressed(BUTTON_UP);
 
 	public var LEFT(get, never):Bool;
 
 	inline function get_LEFT()
-		return _left.check();
+		return _left.check() || mobileControlsPressed(BUTTON_LEFT);
 
 	public var RIGHT(get, never):Bool;
 
 	inline function get_RIGHT()
-		return _right.check();
+		return _right.check() || mobileControlsPressed(BUTTON_RIGHT);
 
 	public var DOWN(get, never):Bool;
 
 	inline function get_DOWN()
-		return _down.check();
+		return _down.check() || mobileControlsPressed(BUTTON_DOWN);
 
 	public var UP_P(get, never):Bool;
 
 	inline function get_UP_P()
-		return _upP.check();
+		return _upP.check() || mobileControlsJustPressed(BUTTON_UP);
 
 	public var LEFT_P(get, never):Bool;
 
 	inline function get_LEFT_P()
-		return _leftP.check();
+		return _leftP.check() || mobileControlsJustPressed(BUTTON_LEFT);
 
 	public var RIGHT_P(get, never):Bool;
 
 	inline function get_RIGHT_P()
-		return _rightP.check();
+		return _rightP.check() || mobileControlsJustPressed(BUTTON_RIGHT);
 
 	public var DOWN_P(get, never):Bool;
 
 	inline function get_DOWN_P()
-		return _downP.check();
+		return _downP.check() || mobileControlsJustPressed(BUTTON_DOWN);
 
 	public var UP_R(get, never):Bool;
 
 	inline function get_UP_R()
-		return _upR.check();
+		return _upR.check() || mobileControlsJustReleased(BUTTON_UP);
 
 	public var LEFT_R(get, never):Bool;
 
 	inline function get_LEFT_R()
-		return _leftR.check();
+		return _leftR.check() || mobileControlsJustReleased(BUTTON_LEFT);
 
 	public var RIGHT_R(get, never):Bool;
 
 	inline function get_RIGHT_R()
-		return _rightR.check();
+		return _rightR.check() || mobileControlsJustReleased(BUTTON_RIGHT);
 
 	public var DOWN_R(get, never):Bool;
 
 	inline function get_DOWN_R()
-		return _downR.check();
+		return _downR.check() || mobileControlsJustReleased(BUTTON_DOWN);
 
 	public var ACCEPT(get, never):Bool;
 
 	inline function get_ACCEPT()
-		return _accept.check();
+		return _accept.check() || mobileControlsJustPressed(BUTTON_A);
 
 	public var BACK(get, never):Bool;
 
 	inline function get_BACK()
-		return _back.check();
+		return _back.check() || mobileControlsJustPressed(BUTTON_B);
 
 	public var PAUSE(get, never):Bool;
 
@@ -203,9 +206,16 @@ class Controls extends FlxActionSet
 	inline function get_CHEAT()
 		return _cheat.check();
 
+	public var mobileC(get, never):Bool;
+
+	private function get_mobileC():Bool
+		return FlxG.save.data.mobileCAlpha >= 0.1;
+
 	#if (haxe >= "4.0.0")
 	public function new(name, scheme = None)
 	{
+		instance = this;
+
 		super(name);
 
 		add(_up);
@@ -262,129 +272,6 @@ class Controls extends FlxActionSet
 		setKeyboardScheme(scheme, false);
 	}
 	#end
-
-	public var trackedInputsUI:Array<FlxActionInput> = [];
-	public var trackedInputsNOTES:Array<FlxActionInput> = [];
-
-	public function addButtonNOTES(action:FlxActionDigital, button:FlxButton, state:FlxInputState):Void
-	{
-		if (button == null)
-			return;
-
-		var input:FlxActionInputDigitalIFlxInput = new FlxActionInputDigitalIFlxInput(button, state);
-		trackedInputsNOTES.push(input);
-		action.add(input);
-	}
-
-	public function addButtonUI(action:FlxActionDigital, button:FlxButton, state:FlxInputState):Void
-	{
-		if (button == null)
-			return;
-
-		var input:FlxActionInputDigitalIFlxInput = new FlxActionInputDigitalIFlxInput(button, state);
-		trackedInputsUI.push(input);
-		action.add(input);
-	}
-
-	public function setHitbox(hitbox:Hitbox):Void
-	{
-		if (hitbox == null)
-			return;
-
-		inline forEachBound(Control.LEFT, (action, state) -> addButtonNOTES(action, hitbox.buttonLeft, state));
-		inline forEachBound(Control.DOWN, (action, state) -> addButtonNOTES(action, hitbox.buttonDown, state));
-		inline forEachBound(Control.UP, (action, state) -> addButtonNOTES(action, hitbox.buttonUp, state));
-		inline forEachBound(Control.RIGHT, (action, state) -> addButtonNOTES(action, hitbox.buttonRight, state));
-	}
-
-	public function setVirtualPadUI(vpad:FlxVirtualPad, DPad:FlxDPadMode, Action:FlxActionMode):Void
-	{
-		if (vpad == null)
-			return;
-
-		switch (DPad)
-		{
-			case UP_DOWN:
-				inline forEachBound(Control.UP, (action, state) -> addButtonUI(action, vpad.buttonUp, state));
-				inline forEachBound(Control.DOWN, (action, state) -> addButtonUI(action, vpad.buttonDown, state));
-			case LEFT_RIGHT:
-				inline forEachBound(Control.LEFT, (action, state) -> addButtonUI(action, vpad.buttonLeft, state));
-				inline forEachBound(Control.RIGHT, (action, state) -> addButtonUI(action, vpad.buttonRight, state));
-			case NONE: // do nothing
-			default:
-				inline forEachBound(Control.UP, (action, state) -> addButtonUI(action, vpad.buttonUp, state));
-				inline forEachBound(Control.DOWN, (action, state) -> addButtonUI(action, vpad.buttonDown, state));
-				inline forEachBound(Control.LEFT, (action, state) -> addButtonUI(action, vpad.buttonLeft, state));
-				inline forEachBound(Control.RIGHT, (action, state) -> addButtonUI(action, vpad.buttonRight, state));
-		}
-
-		switch (Action)
-		{
-			case A:
-				inline forEachBound(Control.ACCEPT, (action, state) -> addButtonUI(action, vpad.buttonA, state));
-			case B:
-				inline forEachBound(Control.BACK, (action, state) -> addButtonUI(action, vpad.buttonB, state));
-			case P:
-				inline forEachBound(Control.PAUSE, (action, state) -> addButtonUI(action, vpad.buttonP, state));
-			case NONE: // do nothing
-			default:
-				inline forEachBound(Control.ACCEPT, (action, state) -> addButtonUI(action, vpad.buttonA, state));
-				inline forEachBound(Control.BACK, (action, state) -> addButtonUI(action, vpad.buttonB, state));
-		}
-	}
-
-	public function setVirtualPadNOTES(vpad:FlxVirtualPad, DPad:FlxDPadMode, Action:FlxActionMode):Void
-	{
-		if (vpad == null)
-			return;
-
-		switch (DPad)
-		{
-			case UP_DOWN:
-				inline forEachBound(Control.UP, (action, state) -> addButtonNOTES(action, vpad.buttonUp, state));
-				inline forEachBound(Control.DOWN, (action, state) -> addButtonNOTES(action, vpad.buttonDown, state));
-			case LEFT_RIGHT:
-				inline forEachBound(Control.LEFT, (action, state) -> addButtonNOTES(action, vpad.buttonLeft, state));
-				inline forEachBound(Control.RIGHT, (action, state) -> addButtonNOTES(action, vpad.buttonRight, state));
-			case NONE: // do nothing
-			default:
-				inline forEachBound(Control.UP, (action, state) -> addButtonNOTES(action, vpad.buttonUp, state));
-				inline forEachBound(Control.DOWN, (action, state) -> addButtonNOTES(action, vpad.buttonDown, state));
-				inline forEachBound(Control.LEFT, (action, state) -> addButtonNOTES(action, vpad.buttonLeft, state));
-				inline forEachBound(Control.RIGHT, (action, state) -> addButtonNOTES(action, vpad.buttonRight, state));
-		}
-
-		switch (Action)
-		{
-			case A:
-				inline forEachBound(Control.ACCEPT, (action, state) -> addButtonNOTES(action, vpad.buttonA, state));
-			case B:
-				inline forEachBound(Control.BACK, (action, state) -> addButtonNOTES(action, vpad.buttonB, state));
-			case P:
-				inline forEachBound(Control.PAUSE, (action, state) -> addButtonNOTES(action, vpad.buttonP, state));
-			case NONE: // do nothing
-			default:
-				inline forEachBound(Control.ACCEPT, (action, state) -> addButtonNOTES(action, vpad.buttonA, state));
-				inline forEachBound(Control.BACK, (action, state) -> addButtonNOTES(action, vpad.buttonB, state));
-		}
-	}
-
-	public function removeVirtualControlsInput(Tinputs:Array<FlxActionInput>):Void
-	{
-		for (action in this.digitalActions)
-		{
-			var i = action.inputs.length;
-			while (i-- > 0)
-			{
-				var x = Tinputs.length;
-				while (x-- > 0)
-				{
-					if (Tinputs[x] == action.inputs[i])
-						action.remove(action.inputs[i]);
-				}
-			}
-		}
-	}
 
 	override function update()
 	{
@@ -728,5 +615,65 @@ class Controls extends FlxActionSet
 		{
 			case Keys: input.device == KEYBOARD;
 		}
+	}
+
+	public function mobileControlsJustPressed(id:MobileButtonsList):Bool
+	{
+		var bools:Array<Bool> = [false, false, false];
+
+		var state:Dynamic = MusicBeatState.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[0] = state.touchPad.buttonJustPressed(id);
+
+		if (state != null && state.mobileControls != null)
+			bools[1] = state.mobileControls.buttonJustPressed(id);
+
+		state = MusicBeatSubstate.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[2] = state.touchPad.buttonJustPressed(id);
+
+		return bools[0] || bools[1] || bools[2];
+	}
+
+	public function mobileControlsJustReleased(id:MobileButtonsList):Bool
+	{
+		var bools:Array<Bool> = [false, false, false];
+
+		var state:Dynamic = MusicBeatState.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[0] = state.touchPad.buttonJustReleased(id);
+
+		if (state != null && state.mobileControls != null)
+			bools[1] = state.mobileControls.buttonJustReleased(id);
+
+		state = MusicBeatSubstate.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[2] = state.touchPad.buttonJustReleased(id);
+
+		return bools[0] || bools[1] || bools[2];
+	}
+
+	public function mobileControlsPressed(id:MobileButtonsList):Bool
+	{
+		var bools:Array<Bool> = [false, false, false];
+
+		var state:Dynamic = MusicBeatState.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[0] = state.touchPad.buttonPressed(id);
+
+		if (state != null && state.mobileControls != null)
+			bools[1] = state.mobileControls.buttonPressed(id);
+
+		state = MusicBeatSubstate.instance;
+
+		if (state != null && state.touchPad != null)
+			bools[2] = state.touchPad.buttonPressed(id);
+
+		return bools[0] || bools[1] || bools[2];
 	}
 }

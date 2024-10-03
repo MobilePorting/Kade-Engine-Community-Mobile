@@ -114,7 +114,7 @@ class ModMenu extends MusicBeatSubstate
 		selectedModifier = modifiers[0];
 		selectModifier(modifiers[0]);
 
-		addVirtualPad(LEFT_FULL, A_B);
+		addTouchPad('LEFT_FULL', 'A_B');
 	}
 
 	private function refresh()

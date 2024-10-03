@@ -162,7 +162,7 @@ class DialogueBox extends FlxSpriteGroup
 		box.updateHitbox();
 		add(box);
 
-		final skipButton:String = #if android "Back" #else MobileControls.enabled ? "X" : "Backspace" #end;
+		final skipButton:String = #if android "Back" #else controls.mobileC ? "X" : "Backspace" #end;
 
 		box.screenCenter(X);
 		portraitLeft.screenCenter(X);
@@ -221,7 +221,7 @@ class DialogueBox extends FlxSpriteGroup
 			dialogueStarted = true;
 		}
 
-		#if !android final vpadBack = @:privateAccess MusicBeatState.instance.virtualPad.buttonP.justPressed; #end
+		#if !android final vpadBack = @:privateAccess MusicBeatState.instance.touchPad.buttonP.justPressed; #end
 		if (#if android FlxG.android.justReleased.BACK #else vpadBack #end || PlayerSettings.player1.controls.BACK && isEnding != true)
 			endDialogue();
 		if (FlxG.mouse.justPressed || PlayerSettings.player1.controls.ACCEPT && dialogueStarted == true)

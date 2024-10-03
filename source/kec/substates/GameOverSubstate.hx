@@ -1,7 +1,7 @@
 package kec.substates;
 
-import kec.objects.Character;
 import kec.backend.PlayStateChangeables;
+import kec.objects.Character;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
@@ -56,8 +56,8 @@ class GameOverSubstate extends MusicBeatSubstate
 		FlxG.camera.scroll.set();
 		FlxG.camera.target = null;
 		bf.playAnim('firstDeath');
-		addVirtualPad(NONE, A_B);
-		addVirtualPadCamera(false);
+		addTouchPad('NONE', 'A_B');
+		addTouchPadCamera();
 		super.create();
 	}
 
@@ -75,8 +75,6 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (controls.BACK)
 		{
 			FlxG.sound.music.stop();
-
-			removeVirtualPad();
 
 			if (PlayState.isStoryMode)
 				MusicBeatState.switchState(new StoryMenuState());
@@ -140,11 +138,10 @@ class GameOverSubstate extends MusicBeatSubstate
 			FlxG.sound.play(Paths.music('gameOverEnd' + stageSuffix));
 			new FlxTimer().start(0.7, function(tmr:FlxTimer)
 			{
-				if (MobileControls.enabled)
-					FlxTween.tween(virtualPad, {alpha: 0}, 2.7, {ease: FlxEase.smootherStepOut});
+				if (controls.mobileC)
+					FlxTween.tween(touchPad, {alpha: 0}, 2.7, {ease: FlxEase.smootherStepOut});
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					removeVirtualPad();
 					LoadingState.loadAndSwitchState(new PlayState());
 				});
 			});

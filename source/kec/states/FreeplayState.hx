@@ -1,12 +1,24 @@
 package kec.states;
 
-import kec.objects.CoolText;
-import kec.backend.chart.Song.Style;
-import kec.backend.util.DiffCalc;
-import kec.backend.PlayStateChangeables;
-import kec.backend.chart.TimingStruct;
-import openfl.media.Sound;
+import flash.text.TextField;
 import flixel.effects.FlxFlicker;
+import kec.backend.Modifiers;
+import kec.backend.PlayStateChangeables;
+import kec.backend.chart.Song.Style;
+import kec.backend.chart.Song;
+import kec.backend.chart.TimingStruct;
+import kec.backend.chart.format.Modern;
+import kec.backend.util.DiffCalc;
+import kec.backend.util.HelperFunctions;
+import kec.backend.util.Highscore;
+import kec.objects.Alphabet;
+import kec.objects.CoolText;
+import kec.objects.ui.HealthIcon;
+import kec.states.editors.ChartingState;
+import kec.substates.FreeplaySubState;
+import lime.app.Application;
+import openfl.media.Sound;
+import openfl.utils.Assets as OpenFlAssets;
 #if FEATURE_FILESYSTEM
 import sys.FileSystem;
 import sys.io.File;
@@ -14,25 +26,13 @@ import sys.io.File;
 #if FEATURE_STEPMANIA
 import kec.backend.util.smTools.SMFile;
 #end
-import kec.backend.chart.format.Modern;
-import lime.app.Application;
-import flash.text.TextField;
-import openfl.utils.Assets as OpenFlAssets;
 #if FEATURE_DISCORD
 import kec.backend.Discord;
 #end
-import kec.substates.FreeplaySubState;
-import kec.backend.Modifiers;
 #if FEATURE_FILESYSTEM
 import sys.FileSystem;
 import sys.io.File;
 #end
-import kec.states.editors.ChartingState;
-import kec.objects.Alphabet;
-import kec.objects.ui.HealthIcon;
-import kec.backend.chart.Song;
-import kec.backend.util.Highscore;
-import kec.backend.util.HelperFunctions;
 
 class FreeplayState extends MusicBeatState
 {
@@ -175,7 +175,7 @@ class FreeplayState extends MusicBeatState
 		bottomBG.alpha = 0.6;
 		add(bottomBG);
 
-		final daSpace:String = MobileControls.enabled ? "X" : "SPACE";
+		final daSpace:String = controls.mobileC ? "X" : "SPACE";
 
 		var bottomText:String = #if PRELOAD_ALL '  Press $daSpace to listen to the Song Instrumental / Click and scroll through the songs with your MOUSE /'
 			+ #else "  Click and scroll through the songs with your MOUSE /"
@@ -227,8 +227,8 @@ class FreeplayState extends MusicBeatState
 
 		add(previewtext);
 
-		final daShift:String = MobileControls.enabled ? "C" : "SHIFT";
-		final daCtrl:String = MobileControls.enabled ? "Y" : "CTRL";
+		final daShift:String = controls.mobileC ? "C" : "SHIFT";
+		final daCtrl:String = controls.mobileC ? "Y" : "CTRL";
 
 		helpText = new CoolText(scoreText.x, scoreText.y + 200, 18, 18, Paths.bitmapFont('fonts/vcr'));
 		helpText.autoSize = true;
@@ -268,7 +268,7 @@ class FreeplayState extends MusicBeatState
 
 		updateTexts();
 
-		addVirtualPad(LEFT_FULL, A_B_C_X_Y_Z);
+		addTouchPad('LEFT_FULL', 'A_B_C_X_Y_Z');
 
 		super.create();
 
@@ -282,10 +282,11 @@ class FreeplayState extends MusicBeatState
 		Debug.logTrace("Took " + Std.string(FlxMath.roundDecimal(haxe.Timer.stamp() - stamp, 3)) + " Seconds To Load Freeplay.");
 	}
 
-	override function closeSubState() {
+	override function closeSubState()
+	{
 		super.closeSubState();
 		persistentUpdate = true;
-		addVirtualPad(LEFT_FULL, A_B_C_X_Y_Z);
+		addTouchPad('LEFT_FULL', 'A_B_C_X_Y_Z');
 	}
 
 	public static var cached:Bool = false;
@@ -613,7 +614,7 @@ class FreeplayState extends MusicBeatState
 		}
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
-		var accepted = virtualPad.buttonA.justPressed || FlxG.keys.justPressed.ENTER && !FlxG.keys.pressed.ALT;
+		var accepted = touchPad.buttonA.justPressed || FlxG.keys.justPressed.ENTER && !FlxG.keys.pressed.ALT;
 		var charting = FlxG.keys.justPressed.SEVEN;
 
 		if (!openMod && !MusicBeatState.switchingState && doUpdateText)
@@ -643,14 +644,14 @@ class FreeplayState extends MusicBeatState
 		previewtext.updateHitbox();
 		previewtext.alpha = 1;
 
-		if (virtualPad.buttonY.justPressed
+		if (touchPad.buttonY.justPressed
 			|| FlxG.keys.justPressed.CONTROL
 			&& !openMod
 			&& !MusicBeatState.switchingState
 			&& doUpdateText)
 		{
 			persistentUpdate = false;
-			removeVirtualPad();
+			removeTouchPad();
 			openMod = true;
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 			openSubState(subStates[0]);
@@ -658,7 +659,7 @@ class FreeplayState extends MusicBeatState
 
 		if (!openMod && !MusicBeatState.switchingState && doUpdateText)
 		{
-			if (virtualPad.buttonC.pressed || FlxG.keys.pressed.SHIFT) // && songs[curSelected].songName.toLowerCase() != "tutorial")
+			if (touchPad.buttonC.pressed || FlxG.keys.pressed.SHIFT) // && songs[curSelected].songName.toLowerCase() != "tutorial")
 			{
 				if (FlxG.keys.justPressed.LEFT || controls.LEFT_P)
 				{
@@ -707,13 +708,13 @@ class FreeplayState extends MusicBeatState
 				if (FlxG.keys.justPressed.RIGHT || controls.RIGHT_P)
 					changeDiff(1);
 
-				if (!MobileControls.enabled && FlxG.mouse.justPressedRight)
+				if (!controls.mobileC && FlxG.mouse.justPressedRight)
 				{
 					changeDiff(1);
 				}
 			}
 
-			if (virtualPad.buttonX.justPressed || FlxG.keys.justPressed.SPACE)
+			if (touchPad.buttonX.justPressed || FlxG.keys.justPressed.SPACE)
 			{
 				dotheMusicThing();
 			}
@@ -743,7 +744,7 @@ class FreeplayState extends MusicBeatState
 
 			for (item in grpSongs.members)
 				if (accepted
-					|| !MobileControls.enabled
+					|| !controls.mobileC
 					&& (((FlxG.mouse.overlaps(item) && item.targetY == curSelected) || (FlxG.mouse.overlaps(iconArray[curSelected])))
 						&& FlxG.mouse.justPressed))
 				{

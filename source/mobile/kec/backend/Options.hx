@@ -3,7 +3,68 @@ package mobile.kec.backend;
 import kec.backend.Options.Option;
 import kec.substates.OptionsMenu;
 
+/**
+ * ...
+ * @author: Lily Ross (mcagabe19)
+ */
 class MobileControlsOption extends Option
+{
+	private var modesList:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox'];
+	@:isVar private var curType(get, set):Int;
+
+	public function new(desc:String)
+	{
+		super();
+		if (OptionsMenu.isInPause)
+		{
+			blocked = true;
+			description = pauseDesc;
+		}
+		else
+			description = desc;
+	}
+
+	public override function left():Bool
+	{
+		changeType(-1);
+		display = updateDisplay();
+		return true;
+	}
+
+	public override function right():Bool
+	{
+		changeType(1);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Mobile Controls: " + modesList[curType];
+	}
+
+	function changeType(change:Int = 0)
+	{
+		curType += change;
+
+		if (curType < 0)
+			curType = modesList.length - 1;
+		if (curType >= modesList.length)
+			curType = 0;
+	}
+
+	private function get_curType():Int
+	{
+		return MobileData.mode;
+	}
+
+	private function set_curType(val:Int):Int
+	{
+		return MobileData.mode = val;
+	}
+}
+
+class CustomTPadSetup extends Option
 {
 	public function new(desc:String)
 	{
@@ -22,13 +83,14 @@ class MobileControlsOption extends Option
 	{
 		if (OptionsMenu.isInPause)
 			return false;
-		FlxG.state.openSubState(new mobile.kec.substates.MobileControlsSelectSubState());
+		FlxG.state.openSubState(new mobile.kec.substates.TouchPadMappingState());
+		kec.substates.OptionsMenu.instance.destroy();
 		return true;
 	}
 
 	private override function updateDisplay():String
 	{
-		return "Mobile Controls";
+		return "Change Custom TouchPad Position";
 	}
 }
 

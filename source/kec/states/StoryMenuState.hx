@@ -1,20 +1,20 @@
 package kec.states;
 
-import flixel.graphics.FlxGraphic;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.graphics.FlxGraphic;
 import flixel.group.FlxGroup;
+import kec.backend.PlayStateChangeables;
+import kec.backend.Stats;
+import kec.backend.WeekData;
+import kec.backend.chart.Song;
+import kec.backend.util.Highscore;
+import kec.objects.CoolText;
+import kec.objects.MenuCharacter;
+import kec.objects.MenuItem;
 import lime.app.Application;
 #if FEATURE_DISCORD
 import kec.backend.Discord;
 #end
-import kec.backend.WeekData;
-import kec.objects.CoolText;
-import kec.objects.MenuItem;
-import kec.objects.MenuCharacter;
-import kec.backend.chart.Song;
-import kec.backend.util.Highscore;
-import kec.backend.PlayStateChangeables;
-import kec.backend.Stats;
 
 class StoryMenuState extends MusicBeatState
 {
@@ -238,7 +238,7 @@ class StoryMenuState extends MusicBeatState
 		changeWeek();
 		changeDifficulty();
 
-		addVirtualPad(UP_DOWN, B);
+		addTouchPad('UP_DOWN', 'B');
 
 		super.create();
 	}

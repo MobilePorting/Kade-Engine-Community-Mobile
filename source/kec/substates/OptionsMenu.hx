@@ -242,12 +242,13 @@ class OptionsMenu extends MusicBeatSubstate
 				#end
 			]),
 			new OptionCata(640, 104, "Mobile", [
+				new mobile.kec.backend.Options.MobileControlsOption("Select The Controls Layout"),
+				new mobile.kec.backend.Options.CustomTPadSetup("Configure The Button's Position For Pad-Custom Control Type."),
 				new mobile.kec.backend.Options.MobileControlsOpacityOption("How Much Opaque Should Mobile Controls Be?"),
 				new mobile.kec.backend.Options.HitboxDesignOption("How Your Hitbox Should Look Like?"),
 				#if mobile
-				new mobile.kec.backend.Options.ScreensaverOption("Should Your Phone Sleep After Going Inactive For Few Seconds? (The Time Depends On Your Phone\'s Options)"),
+				new mobile.kec.backend.Options.ScreensaverOption("Should Your Phone Sleep After Going Inactive For Few Seconds? (The Time Depends On Your Phone\'s Options)")
 				#end
-				new mobile.kec.backend.Options.MobileControlsOption("Change Mobile Controls Type.")
 			]),
 			new OptionCata(-1, 155, "Editing Keybinds", [
 				new LeftKeybind("The left note's keybind"),
@@ -347,7 +348,7 @@ class OptionsMenu extends MusicBeatSubstate
 
 		switchCat(selectedCat);
 
-		addVirtualPad(LEFT_FULL, A_B);
+		addTouchPad('LEFT_FULL', 'A_B');
 
 		super.create();
 	}
@@ -472,10 +473,10 @@ class OptionsMenu extends MusicBeatSubstate
 		down = controls.DOWN_P || FlxG.keys.justPressed.DOWN;
 
 		any = FlxG.keys.justPressed.ANY;
-		escape = virtualPad.buttonB.justPressed || FlxG.keys.justPressed.ESCAPE;
+		escape = touchPad.buttonB.justPressed || FlxG.keys.justPressed.ESCAPE;
 
 		if (!exiting)
-			virtualPad.alpha = FlxG.save.data.mobileCAlpha;
+			touchPad.alpha = FlxG.save.data.mobileCAlpha;
 
 		if (selectedCat != null && !exiting)
 		{
@@ -573,14 +574,14 @@ class OptionsMenu extends MusicBeatSubstate
 							MusicBeatState.switchState(new MainMenuState());
 						}
 					});
-					if (MobileControls.enabled)
-						FlxTween.tween(virtualPad, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
+					if (controls.mobileC)
+						FlxTween.tween(touchPad, {alpha: 0}, 0.5, {ease: FlxEase.smootherStepInOut});
 				}
 				else
 				{
 					PauseSubState.goBack = true;
-					PauseSubState.instance.addVirtualPad(UP_DOWN, A);
-					PauseSubState.instance.addVirtualPadCamera(false);
+					PauseSubState.instance.addTouchPad('UP_DOWN', 'A');
+					PauseSubState.instance.addTouchPadCamera();
 					PlayState.instance.updateSettings();
 					close();
 				}

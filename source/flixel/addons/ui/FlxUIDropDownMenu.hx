@@ -1,20 +1,20 @@
 package flixel.addons.ui;
 
-import openfl.geom.Rectangle;
+import flixel.addons.ui.FlxUI9SliceSprite;
+import flixel.addons.ui.FlxUI;
+import flixel.addons.ui.FlxUIAssets;
+import flixel.addons.ui.FlxUIButton;
+import flixel.addons.ui.FlxUIGroup;
+import flixel.addons.ui.FlxUISpriteButton;
+import flixel.addons.ui.FlxUIText;
+import flixel.addons.ui.StrNameLabel;
 import flixel.addons.ui.interfaces.IFlxUIClickable;
 import flixel.addons.ui.interfaces.IFlxUIWidget;
 import flixel.addons.ui.interfaces.IHasParams;
 import flixel.ui.FlxButton;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxStringUtil;
-import flixel.addons.ui.FlxUIGroup;
-import flixel.addons.ui.FlxUIText;
-import flixel.addons.ui.FlxUIButton;
-import flixel.addons.ui.FlxUISpriteButton;
-import flixel.addons.ui.FlxUI9SliceSprite;
-import flixel.addons.ui.FlxUIAssets;
-import flixel.addons.ui.StrNameLabel;
-import flixel.addons.ui.FlxUI;
+import openfl.geom.Rectangle;
 
 /*
 
@@ -429,7 +429,7 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 		#if (FLX_MOUSE || FLX_TOUCH)
 		if (dropPanel.visible)
 		{
-			if (MobileControls.enabled)
+			if (controls.mobileC)
 			{
 				if (list.length > 1 && canScroll)
 				{

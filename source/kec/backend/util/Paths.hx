@@ -39,6 +39,9 @@ class Paths
 
 	public static function getPath(file:String, ?type:AssetType = TEXT, ?library:Null<String> = null):String
 	{
+		if (library == "mobile")
+			return 'mobile:assets/mobile/$file';
+
 		if (library != null)
 			return getLibraryPath(file, library);
 

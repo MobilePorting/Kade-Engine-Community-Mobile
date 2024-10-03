@@ -3,7 +3,7 @@ package kec.backend.script;
 import flixel.util.FlxAxes;
 import StringTools;
 import flixel.graphics.FlxGraphic;
-import flixel.system.FlxAssets.FlxShader;
+import mobile.flixel.system.FlxShader;
 import haxe.Json;
 import openfl.Lib;
 import openfl.filters.ShaderFilter;

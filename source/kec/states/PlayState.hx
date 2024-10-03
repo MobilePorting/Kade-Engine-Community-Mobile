@@ -18,11 +18,13 @@ import kec.backend.chart.Song.StyleData;
 import kec.backend.chart.Song;
 import kec.backend.chart.TimingStruct;
 import kec.backend.chart.format.Modern;
+import kec.backend.chart.format.Section;
 import kec.backend.util.HelperFunctions;
 import kec.backend.util.Highscore;
 import kec.backend.util.NoteStyleHelper;
 import kec.backend.util.Sort;
 import kec.objects.Alphabet;
+import kec.objects.Bar;
 import kec.objects.Character;
 import kec.objects.note.Note;
 import kec.objects.note.NoteSplash;
@@ -45,8 +47,6 @@ import openfl.Lib;
 import openfl.events.KeyboardEvent;
 import openfl.media.Sound;
 import openfl.utils.Assets as OpenFlAssets;
-import kec.objects.Bar;
-import kec.backend.chart.format.Section;
 #if FEATURE_STEPMANIA
 import kec.backend.util.smTools.SMFile;
 #end
@@ -760,16 +760,14 @@ class PlayState extends MusicBeatState
 
 		// If A Song Doesn't Have Events, It Makes One Automatically.
 
-		addVirtualPad(NONE, P);
-		addVirtualPadCamera(false);
-		#if !android virtualPad.visible = true #else virtualPad.alpha = 0 #end;
+		addTouchPad('NONE', 'P');
+		addTouchPadCamera();
+		#if !android touchPad.visible = true #else touchPad.alpha = 0 #end;
 
-		addMobileControls(false);
-		mobileControls.onInputUp.add(releaseMobileInput);
-		mobileControls.onInputDown.add(handleMobileInput);
+		addMobileControls();
 
-		if (MobileControls.mode != "Hitbox")
-			mobileControls.alpha = 0;
+		if (MobileData.mode != 3)
+			mobileControls.instance.alpha = 0;
 
 		generateSong(SONG.songId);
 
@@ -1090,7 +1088,7 @@ class PlayState extends MusicBeatState
 		pushSub(new ResultsScreen());
 		pushSub(new GameOverSubstate());
 		pushSub(new OptionsMenu(true));
-	
+
 		#if FEATURE_LUAMODCHART
 		if (executeModchart)
 		{
@@ -1286,9 +1284,9 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		mobileControls.visible = true;
+		mobileControls.instance.visible = true;
 
-		if (MobileControls.mode != "Hitbox")
+		if (MobileData.mode != 3)
 			createTween(mobileControls, {alpha: FlxG.save.data.mobileCAlpha}, 0.4);
 
 		inCinematic = false;
@@ -1528,122 +1526,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	private function handleMobileInput(button:mobile.flixel.FlxButton):Void
-	{ // this actually handles flxbutton presses
-
-		if (PlayStateChangeables.botPlay || paused || button == null || button.bindedDirection == null)
-			return;
-
-		// checking the button's FlxInput cuz it's faster and more direct :3
-		@:privateAccess
-		if (button.input.justPressed)
-		{
-			var lastConductorTime:Float = Conductor.songPosition;
-
-			Conductor.songPosition = lastConductorTime;
-
-			var data = -1;
-
-			// made direction shit for each button, no idea how i could set these numbers up other than this :/
-			switch (button.bindedDirection) // arrow buttons
-			{
-				case LEFT:
-					data = 0;
-				case DOWN:
-					data = 1;
-				case UP:
-					data = 2;
-				case RIGHT:
-					data = 3;
-			}
-
-			if (data == -1)
-			{
-				return;
-			}
-
-			// we can still use the keys array i guess?
-			if (keys[data])
-			{
-				return;
-			}
-
-			// fine by me
-			keys[data] = true;
-
-			var closestNotes:Array<Note> = notes.members.filter(function(aliveNote:Note)
-			{
-				return aliveNote != null && aliveNote.alive && aliveNote.canBeHit && aliveNote.mustPress && !aliveNote.wasGoodHit
-					&& !aliveNote.isSustainNote && aliveNote.noteData == data;
-			});
-
-			var defNotes:Array<Note> = [for (v in closestNotes) v];
-
-			haxe.ds.ArraySort.sort(defNotes, Sort.sortNotes);
-
-			if (closestNotes.length != 0)
-			{
-				var coolNote = null;
-				coolNote = defNotes[0];
-
-				if (defNotes.length > 1) // stacked notes or really close ones
-				{
-					for (i in 0...defNotes.length)
-					{
-						if (i == 0) // skip the first note
-							continue;
-
-						var note = defNotes[i];
-
-						if (!note.isSustainNote && ((note.strumTime - coolNote.strumTime) < 2) && note.noteData == data)
-						{
-							trace('found a stacked/really close note ' + (note.strumTime - coolNote.strumTime));
-							// just fuckin remove it since it's a stacked note and shouldn't be there
-							destroyNote(note);
-						}
-					}
-				}
-
-				goodNoteHit(coolNote);
-			}
-			else if (!FlxG.save.data.ghost && songStarted)
-			{
-				noteMissPress(data);
-			}
-
-			if (songStarted && !inCutscene && !paused)
-				keyShit();
-		}
-	}
-
-	private function releaseMobileInput(button:mobile.flixel.FlxButton):Void // handles releases for mobile controls
-	{
-		if (PlayStateChangeables.botPlay || button == null || button.bindedDirection == null)
-			return;
-
-		var data = -1;
-
-		switch (button.bindedDirection) // arrow buttons
-		{
-			case LEFT:
-				data = 0;
-			case DOWN:
-				data = 1;
-			case UP:
-				data = 2;
-			case RIGHT:
-				data = 3;
-		}
-
-		if (data == -1)
-			return;
-
-		keys[data] = false;
-
-		if (songStarted && !paused)
-			keyShit();
-	}
-
 	private function handleHolds(note:Note)
 	{
 		// HOLDS, check for sustain notes
@@ -1841,7 +1723,7 @@ class PlayState extends MusicBeatState
 			createTween(songPosBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		}
 
-		final mafakaKey:String = MobileControls.enabled ? "X" : "Space";
+		final mafakaKey:String = controls.mobileC ? "P" : "Space";
 
 		if (needSkip)
 		{
@@ -1857,7 +1739,7 @@ class PlayState extends MusicBeatState
 			skipText.alpha = 0;
 			createTween(skipText, {alpha: 1}, 0.2);
 			#if android
-			createTween(virtualPad, {alpha: FlxG.save.data.mobileCAlpha}, 0.2);
+			createTween(touchPad, {alpha: FlxG.save.data.mobileCAlpha}, 0.2);
 			#end
 			skipText.cameras = [camHUD];
 			add(skipText);
@@ -2386,7 +2268,7 @@ class PlayState extends MusicBeatState
 			&& !inCutscene
 			||
 		#else
-			virtualPad.buttonP.justPressed
+			touchPad.buttonP.justPressed
 			&& !inCutscene
 			&& !skipActive
 			||
@@ -2460,12 +2342,12 @@ class PlayState extends MusicBeatState
 		{
 			remove(skipText);
 			#if android
-			removeVirtualPad();
+			removeTouchPad();
 			#end
 			skipActive = false;
 		}
 
-		if ((FlxG.keys.justPressed.SPACE || virtualPad.buttonP.justPressed) && skipActive)
+		if ((FlxG.keys.justPressed.SPACE || touchPad.buttonP.justPressed) && skipActive)
 		{
 			lastPos = skipTo;
 			Conductor.elapsedPosition = skipTo;
@@ -2473,10 +2355,10 @@ class PlayState extends MusicBeatState
 			checkMusicSync();
 			createTween(skipText, {alpha: 0}, 0.2);
 			#if android
-			createTween(virtualPad, {alpha: 0}, 0.2, {
+			createTween(touchPad, {alpha: 0}, 0.2, {
 				onComplete: function(tw)
 				{
-					removeVirtualPad();
+					removeTouchPad();
 				}
 			});
 			#end
@@ -2879,7 +2761,7 @@ class PlayState extends MusicBeatState
 
 	function endSong():Void
 	{
-		camZooming = mobileControls.visible = #if !android virtualPad.visible = #end
+		camZooming = mobileControls.instance.visible = #if !android touchPad.visible = #end
 		false;
 		endingSong = true;
 		inDaPlay = false;

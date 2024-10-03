@@ -1,10 +1,10 @@
 package kec.substates;
 
-import kec.backend.Controls.Control;
 import flixel.addons.transition.FlxTransitionableState;
-import kec.objects.Alphabet;
+import kec.backend.Controls.Control;
 import kec.backend.PlayStateChangeables;
 import kec.backend.chart.Song;
+import kec.objects.Alphabet;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -105,8 +105,8 @@ class PauseSubState extends MusicBeatSubstate
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 
-		addVirtualPad(UP_DOWN, A);
-		addVirtualPadCamera(false);
+		addTouchPad('UP_DOWN', 'A');
+		addTouchPadCamera();
 
 		super.create();
 	}
@@ -148,7 +148,7 @@ class PauseSubState extends MusicBeatSubstate
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		}
 
-		if ((controls.ACCEPT && !FlxG.keys.pressed.ALT) || !MobileControls.enabled && FlxG.mouse.pressed)
+		if ((controls.ACCEPT && !FlxG.keys.pressed.ALT) || !controls.mobileC && FlxG.mouse.pressed)
 		{
 			var daSelected:String = menuItems[curSelected];
 
@@ -187,7 +187,6 @@ class PauseSubState extends MusicBeatSubstate
 					regenMenu();
 				case "Options":
 					goToOptions = true;
-					removeVirtualPad();
 					close();
 				case "BACK":
 					menuItems = pauseOG;

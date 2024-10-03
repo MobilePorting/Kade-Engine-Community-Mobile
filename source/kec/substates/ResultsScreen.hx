@@ -1,21 +1,21 @@
 package kec.substates;
 
-import flixel.util.FlxAxes;
 import flixel.input.FlxInput;
-#if FEATURE_FILESYSTEM
-import sys.io.File;
-import Sys;
-import sys.FileSystem;
-#end
+import flixel.util.FlxAxes;
+import kec.backend.PlayStateChangeables;
+import kec.backend.PlayerSettings;
+import kec.backend.Ratings;
+import kec.backend.Stats;
+import kec.backend.util.HelperFunctions;
+import kec.backend.util.Highscore;
 import kec.objects.HitGraph;
 import kec.objects.OFLSprite;
 import kec.objects.note.Note;
-import kec.backend.PlayStateChangeables;
-import kec.backend.Ratings;
-import kec.backend.util.HelperFunctions;
-import kec.backend.util.Highscore;
-import kec.backend.PlayerSettings;
-import kec.backend.Stats;
+#if FEATURE_FILESYSTEM
+import Sys;
+import sys.FileSystem;
+import sys.io.File;
+#end
 
 class ResultsScreen extends MusicBeatSubstate
 {
@@ -98,8 +98,7 @@ class ResultsScreen extends MusicBeatSubstate
 		comboText.color = FlxColor.WHITE;
 		comboText.scrollFactor.set();
 
-		contText = new FlxText(FlxG.width - 525, FlxG.height + 50, 0,
-			MobileControls.enabled ? 'Touch to continue.' : 'Click or Press ENTER to continue.');
+		contText = new FlxText(FlxG.width - 525, FlxG.height + 50, 0, controls.mobileC ? 'Touch to continue.' : 'Click or Press ENTER to continue.');
 		contText.font = Paths.font("vcr.ttf");
 		contText.size = 24;
 		contText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 2, 1);
@@ -153,7 +152,7 @@ class ResultsScreen extends MusicBeatSubstate
 		var bads = PlayState.isStoryMode ? Stats.campaignBads : Stats.bads;
 		var shits = PlayState.isStoryMode ? Stats.campaignShits : Stats.shits;
 
-		final blyad:String = MobileControls.enabled ? "" : '\n\n\nF1 - Replay song';
+		final blyad:String = controls.mobileC ? "" : '\n\n\nF1 - Replay song';
 		comboText.text = 'Judgements:\nMarvs - ${marvs}\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\n\nCombo Breaks: ${(PlayState.isStoryMode ? Stats.campaignMisses : Stats.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(Stats.accuracy)} ${Ratings.GenerateLetterRank(Stats.accuracy)}\nRate: ${HelperFunctions.truncateFloat(Conductor.rate, 2)}x$blyad';
 
 		add(comboText);
