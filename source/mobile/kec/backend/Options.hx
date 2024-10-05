@@ -84,7 +84,6 @@ class CustomTPadSetup extends Option
 		if (OptionsMenu.isInPause)
 			return false;
 		FlxG.state.openSubState(new mobile.kec.substates.TouchPadMappingState());
-		kec.substates.OptionsMenu.instance.destroy();
 		return true;
 	}
 
