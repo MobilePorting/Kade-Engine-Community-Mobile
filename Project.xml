@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
-	<app title="Kade Engine Community" file="Kade Engine Community" packageName="com.therealjake12.kec" package="com.therealjake12.kec" main="Main" version="1.9.4" company="TheRealJake12" />
+	<app title="Kade Engine Community" file="KadeEngineCommunity" packageName="com.therealjake12.kec" package="com.therealjake12.kec" main="Main" version="1.9.4" company="TheRealJake12" />
 	<!-- Switch Export with Unique ApplicationID and Icon -->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB" />
