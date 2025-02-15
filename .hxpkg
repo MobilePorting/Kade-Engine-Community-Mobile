@@ -33,7 +33,8 @@
         "link": "https://github.com/swordcube/scriptless-polymod.git"
       },
       {
-        "name": "hxvlc"
+        "name": "hxvlc",
+        "link": "https://github.com/MobilePorting/hxvlc.git"
       },
       {
         "name": "hscript"
