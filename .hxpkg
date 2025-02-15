@@ -9,7 +9,8 @@
       },
       {
         "name": "openfl",
-        "version": "9.3.4"
+        "link": "https://github.com/mcagabe19-stuff/openfl.git",
+        "branch": "9.3.4"
       },
       {
         "name": "lime",
