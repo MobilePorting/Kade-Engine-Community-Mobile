@@ -6,7 +6,7 @@ permissions:
   discussions: write
 
 env:
-  PROJECT_NAME: "Kade Engine Community"
+  PROJECT_NAME: "KadeEngineCommunity"
   REPO_PATH: MobilePorting/Kade-Engine-Community-Mobile
 
 jobs:
