@@ -40,6 +40,8 @@ jobs:
       - name: Setup Haxe (Linux ARM64 Workaround)
         if: inputs.name == 'Linux ARM64'
         run: |
+          sudo add-apt-repository ppa:haxe/releases -y
+          sudo apt-get update
           sudo apt install haxe -y
           haxelib setup ~/haxelib
 
