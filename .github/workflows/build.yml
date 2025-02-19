@@ -32,12 +32,25 @@ jobs:
         uses: actions/checkout@main
 
       - name: Setup Haxe
+        if: inputs.name != 'Linux ARM64'
         uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
 
+      - name: Setup Haxe (Linux ARM64 Workaround)
+        if: inputs.name == 'Linux ARM64'
+        run: |
+          sudo apt install haxe -y
+          haxelib setup ~/haxelib
+
+      - name: Setup MSVC Arm64
+        if: inputs.name == 'Windows ARM64'
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: amd64_arm64
+
       - name: Install libVLC
-        if: inputs.name == 'Linux'
+        if: contains(inputs.name, 'Linux')
         run: sudo apt install libvlc-dev libvlccore-dev
 
       - name: Install Libraries

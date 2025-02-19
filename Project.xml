@@ -126,6 +126,7 @@
 	</section>
 	<section if="hxvlc">
 		<haxedef name="HXVLC_NO_SHARE_DIRECTORY" />
+		<haxedef name="HXVLC_EXPERIMENTAL_WINDOWSARM" if="windows HXCPP_ARM64" />
 		<haxedef name="HXVLC_OPENAL" />
 	</section>
 	<!-- Basically Allows Videos To Render In Higher Quality On Higher Resoluttions -->
