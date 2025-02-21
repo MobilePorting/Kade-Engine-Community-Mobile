@@ -11,22 +11,22 @@ jobs:
           - name: Windows
             os: windows-2022
             buildArgs: windows
-            artifactName: windowsBuild
+            artifactName: windowsBuild-x86_64
             artifactPath: export\release\windows\bin\*
           - name: Windows ARM64
             os: windows-2022
             buildArgs: "windows -arm64 -D HXCPP_ARM64"
-            artifactName: windowsArm64Build
+            artifactName: windowsBuild-arm64
             artifactPath: export\release\windows\bin\*
           - name: Linux
             os: ubuntu-22.04
             buildArgs: linux
-            artifactName: linuxBuild
+            artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
           - name: Linux ARM64
             os: ubuntu-22.04-arm
             buildArgs: linux
-            artifactName: linuxArm64Build
+            artifactName: linuxBuild-arm64
             artifactPath: export/release/linux/bin/*
           - name: macOS x86_64
             os: macos-14
