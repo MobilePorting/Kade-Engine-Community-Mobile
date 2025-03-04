@@ -94,7 +94,6 @@
 	<section if="cpp">
 		<haxelib name="hxvlc" if="VIDEOS" />
 	</section>
-	<haxelib name="extension-androidtools" if="android"/>
 	<section if="debug">
 		<!-- These defines are mostly for testing (aren't required to be used) -->
 		<haxedef name="HXVLC_VERBOSE" value="2" />
