@@ -9,12 +9,12 @@
       },
       {
         "name": "openfl",
-        "link": "https://github.com/mcagabe19-stuff/openfl.git",
+        "link": "https://github.com/MobilePorting/openfl.git",
         "branch": "9.3.4"
       },
       {
         "name": "lime",
-        "link": "https://github.com/mcagabe19-stuff/lime.git"
+        "link": "https://github.com/MobilePorting/lime.git"
       },
       {
         "name": "flixel-tools"
@@ -49,7 +49,7 @@
       },
       {
         "name": "hxcpp",
-        "link": "https://github.com/mcagabe19-stuff/hxcpp.git"
+        "link": "https://github.com/MobilePorting/hxcpp.git"
       },
       {
         "name": "thx.semver"
